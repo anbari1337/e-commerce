@@ -1,0 +1,29 @@
+version: '3.2'
+
+services:
+  db-user:
+    networks:
+      - ecom-app
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=user-database
+  user-service:
+    networks:
+      - ecom-app
+    image: aanbari/user-service:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db-user
+    environment:
+      - SPRING_DATA_SOURCE_URL=jdbc:postgresql://db-user:5432/user-database
+      - SPRING_DATA_SOURCE_USERNAME=admin
+      - SPRING_DATA_SOURCE_PASSWORD=admin
+      - SPRING_JPA_HIBERNATE_DDL_AUT0=update
+networks:
+  ecom-app:
+    driver: bridge

@@ -1,5 +1,6 @@
 package com.z7.userservice.security;
 
+import com.z7.userservice.exceptions.UserNotFoundException;
 import com.z7.userservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +28,7 @@ public class AuthConfig {
         return username -> {
             try {
                 return userRepository.findByEmail(username)
-                        .orElseThrow(() -> new Exception("User not found")); //TODO: create UserNotFoundException
+                        .orElseThrow(() -> new UserNotFoundException("User not found with email: "+username));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

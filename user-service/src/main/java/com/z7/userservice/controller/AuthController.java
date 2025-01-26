@@ -28,9 +28,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> signup(@RequestBody LoginDto input) {
-        User newUser = authService.login(input);
+    public ResponseEntity<String> signup(@RequestBody LoginDto input) throws Exception{
 
+        User newUser = authService.login(input);
         String token = jwtService.generateToken(newUser);
         return ResponseEntity.ok(token);
     }

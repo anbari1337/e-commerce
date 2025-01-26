@@ -3,6 +3,7 @@ package com.z7.userservice.service;
 import com.z7.userservice.dto.LoginDto;
 import com.z7.userservice.dto.SignupDto;
 import com.z7.userservice.entity.User;
+import com.z7.userservice.exceptions.UserNotFoundException;
 import com.z7.userservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -34,9 +35,11 @@ public class AuthService {
         return userRepository.save(newUser);
     }
 
-    public User login(LoginDto loginDto) {
+    public User login(LoginDto loginDto) throws Exception {
 
-        return userRepository.findByEmail(loginDto.getEmail()).orElseThrow(); // TODO UserNotFound Exception
+        return userRepository
+                .findByEmail(loginDto.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: "+loginDto.getEmail()));
     }
 
 }

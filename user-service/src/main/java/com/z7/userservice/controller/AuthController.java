@@ -5,8 +5,10 @@ import com.z7.userservice.dto.SignupDto;
 import com.z7.userservice.entity.User;
 import com.z7.userservice.service.AuthService;
 import com.z7.userservice.service.JwtService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,14 +17,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    @Autowired
-    AuthService authService;
-    @Autowired
-    JwtService jwtService;
+    private final AuthService authService;
+    private final JwtService jwtService;
 
+    @Autowired
+    public AuthController(AuthService authService, JwtService jwtService){
+        this.authService = authService;
+        this.jwtService = jwtService;
+    }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> signup(@RequestBody SignupDto user) {
+    public ResponseEntity<?> signup(@RequestBody @Valid SignupDto user, BindingResult result) {
+
+        // Check if there are validation errors
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(result.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .toList());
+        }
+
         User newUser = authService.signup(user);
         return ResponseEntity.ok(newUser);
     }

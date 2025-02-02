@@ -4,4 +4,7 @@
 - [x] Signup
 - [x] Login
 - [x] Exceptions and exceptions handlers
-- [ ] Email and password validation
+- [x] Email and password validation
+- [ ] Adding Roles
+- [ ] /user/{id}
+- [x] /users

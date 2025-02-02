@@ -1,0 +1,1 @@
+- [ ] reduce quantity in stock

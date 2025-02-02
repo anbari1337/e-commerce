@@ -1,6 +1,13 @@
 version: '3.2'
 
 services:
+  db-inventory:
+    networks:
+      - ecom-app
+    image: mongo
+    ports:
+      - "27017:27017"
+  
   db-product:
     networks:
       - ecom-app

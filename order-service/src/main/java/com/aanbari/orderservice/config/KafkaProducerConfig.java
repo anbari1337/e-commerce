@@ -1,7 +1,5 @@
 package com.aanbari.orderservice.config;
 
-import com.aanbari.orderservice.dto.OrderEvent;
-import com.aanbari.orderservice.dto.ProductInventoryEvent;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -25,24 +23,16 @@ public class KafkaProducerConfig {
 
 
     @Bean
-    public ProducerFactory<String, OrderEvent> producerFactory() {
+    public <T> ProducerFactory<String, T> producerFactory(){
         return new DefaultKafkaProducerFactory<>(producerConfig());
     }
 
-    @Bean
-    public ProducerFactory<String, ProductInventoryEvent> producerFactoryInventory() {
-        return new DefaultKafkaProducerFactory<>(producerConfig());
-    }
 
     @Bean
-    public KafkaTemplate<String, OrderEvent> kafkaTemplate(ProducerFactory<String, OrderEvent> pf) {
-        return new KafkaTemplate<String, OrderEvent>(pf);
+    public <T> KafkaTemplate<String, T> kafkaTemplate(ProducerFactory<String, T> pf) {
+        return new KafkaTemplate<>(pf);
     }
 
-    @Bean
-    public KafkaTemplate<String, ProductInventoryEvent> kafkaTemplateInventory(ProducerFactory<String, ProductInventoryEvent> pf) {
-        return new KafkaTemplate<String, ProductInventoryEvent>(pf);
-    }
 
     @Bean
     public Map<String, Object> producerConfig() {

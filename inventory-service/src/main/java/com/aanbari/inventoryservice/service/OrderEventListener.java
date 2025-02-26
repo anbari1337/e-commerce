@@ -13,9 +13,9 @@ import java.util.Map;
 
 @Service
 public class OrderEventListener {
-    private InventoryService inventoryService;
-    private KafkaTemplate<String, InventoryEvent> kafkaTemplate;
-    private NewTopic topic;
+    private final InventoryService inventoryService;
+    private final KafkaTemplate<String, InventoryEvent> kafkaTemplate;
+    private final NewTopic topic;
 
 
     @Autowired
@@ -26,7 +26,7 @@ public class OrderEventListener {
     }
 
     @KafkaListener(topics = "${spring.kafka.template.topic}", groupId = "${spring.kafka.group}",
-            containerFactory = "kafkaListenerContainerFactory")
+            containerFactory = "orderEventListenerFactory")
     public void checkProductAvailability(OrderEvent event) {
         Map<String, Boolean> productAvailability = inventoryService.isProductAvailable(event.getProductId());
         kafkaTemplate.send(topic.name(),
@@ -38,7 +38,7 @@ public class OrderEventListener {
     }
 
     @KafkaListener(topics = "${spring.kafka.topic.update-inventory}", groupId = "${spring.kafka.group}",
-            containerFactory = "inventoryListenerFactory")
+            containerFactory = "productInventoryEventListenerFactory")
     public void updateInventory(ProductInventoryEvent event) {
         event.getProductQuantity().keySet().forEach(productId -> {
             inventoryService.updateInventory(productId, event.getProductQuantity().get(productId));

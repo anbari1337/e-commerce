@@ -2,6 +2,7 @@ package com.aanbari.productservice.service;
 
 import com.aanbari.productservice.dto.ProductDto;
 import com.aanbari.productservice.entity.Product;
+import com.aanbari.productservice.exception.ProductNotFoundException;
 import com.aanbari.productservice.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,8 @@ public class ProductService {
         );
     }
 
-    public Product getProductById(String id){
-        return  productRepository.findById(id).orElseThrow(); // TODO ProductNotFoundException
+    public Product getProductById(String id) throws Exception{
+        return  productRepository.findById(id).orElseThrow(()-> new ProductNotFoundException("Product not found with id="+id)); // TODO ProductNotFoundException
     }
 
 }

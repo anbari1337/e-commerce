@@ -20,16 +20,7 @@ public class KafkaConsumerConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     String bootstrapServers;
 
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, InventoryEvent> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, InventoryEvent> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerConfig());
-        return factory;
-    }
-
-    @Bean
-    public ConsumerFactory<String, InventoryEvent> consumerConfig() {
+    private Map<String, Object> consumerConfig() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         // 🔹 Wrap the deserializers inside ErrorHandlingDeserializer
@@ -42,8 +33,32 @@ public class KafkaConsumerConfig {
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
         props.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
 
-        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(InventoryEvent.class));
+        return props;
     }
 
+    private <T> ConcurrentKafkaListenerContainerFactory<String, T> createListenerContainerFactory(Class<T> eventType) {
+        ConcurrentKafkaListenerContainerFactory<String, T> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(createConsumerFactory(eventType));
+        return factory;
+    }
+
+    private <T> ConsumerFactory<String, T> createConsumerFactory(Class<T> eventType) {
+        Map<String, Object> config = new HashMap<>(consumerConfig());
+        config.put(JsonDeserializer.VALUE_DEFAULT_TYPE, eventType.getName()); // Ensure correct deserialization
+
+        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(eventType));
+    }
+
+
+    @Bean
+    public ConsumerFactory<String, InventoryEvent> inventoryEventConsumerFactory(){
+        return createConsumerFactory(InventoryEvent.class);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, InventoryEvent> inventoryEventListenerFactory(){
+        return createListenerContainerFactory(InventoryEvent.class);
+    }
 }
 

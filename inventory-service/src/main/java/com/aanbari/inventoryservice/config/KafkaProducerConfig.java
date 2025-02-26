@@ -1,7 +1,6 @@
 package com.aanbari.inventoryservice.config;
 
 
-import com.aanbari.inventoryservice.dto.InventoryEvent;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -27,8 +26,14 @@ public class KafkaProducerConfig {
 
 
     @Bean
-    public ProducerFactory<String, InventoryEvent> producerFactory() {
+    public <T> ProducerFactory<String, T> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfig());
+    }
+
+
+    @Bean
+    public <T> KafkaTemplate<String, T> kafkaTemplate(ProducerFactory<String, T> pf) {
+        return new KafkaTemplate<>(pf);
     }
 
     @Bean
@@ -53,10 +58,6 @@ public class KafkaProducerConfig {
                 .build();
     }
 
-    @Bean
-    public KafkaTemplate<String, InventoryEvent> kafkaTemplate(ProducerFactory<String, InventoryEvent> pf) {
-        return new KafkaTemplate<String, InventoryEvent>(pf);
-    }
 
 
 }

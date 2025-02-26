@@ -31,7 +31,7 @@ public class InventoryEventListener {
     }
 
     @KafkaListener(topics = "${spring.kafka.template.topic}", groupId = "${spring.kafka.group}",
-            containerFactory = "kafkaListenerContainerFactory")
+            containerFactory = "inventoryEventListenerFactory")
     public void checkProductAvailability(InventoryEvent event) {
         Map<String, Boolean> productAvailability = event.getProductAvailability();
         boolean allAvailable = true;

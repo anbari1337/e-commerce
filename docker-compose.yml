@@ -15,6 +15,17 @@ services:
     ports:
       - "27017:27017"
 
+  db-order:
+    networks:
+      - ecom-app
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=order-database
+
   db-user:
     networks:
       - ecom-app
@@ -38,6 +49,34 @@ services:
       - SPRING_DATA_SOURCE_USERNAME=admin
       - SPRING_DATA_SOURCE_PASSWORD=admin
       - SPRING_JPA_HIBERNATE_DDL_AUT0=update
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - ecom-app
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    restart: always
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+    networks:
+        - ecom-app
+
+
 networks:
   ecom-app:
     driver: bridge

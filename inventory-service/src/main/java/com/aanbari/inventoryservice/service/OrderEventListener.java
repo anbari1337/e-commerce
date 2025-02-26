@@ -2,6 +2,7 @@ package com.aanbari.inventoryservice.service;
 
 import com.aanbari.inventoryservice.dto.InventoryEvent;
 import com.aanbari.inventoryservice.dto.OrderEvent;
+import com.aanbari.inventoryservice.dto.ProductInventoryEvent;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,6 +16,7 @@ public class OrderEventListener {
     private InventoryService inventoryService;
     private KafkaTemplate<String, InventoryEvent> kafkaTemplate;
     private NewTopic topic;
+
 
     @Autowired
     public OrderEventListener(InventoryService inventoryService, KafkaTemplate<String, InventoryEvent> kafkaTemplate, NewTopic topic) {
@@ -33,6 +35,14 @@ public class OrderEventListener {
                         .orderId(event.getOrderId())
                         .productAvailability(productAvailability)
                         .build());
+    }
+
+    @KafkaListener(topics = "${spring.kafka.topic.update-inventory}", groupId = "${spring.kafka.group}",
+            containerFactory = "inventoryListenerFactory")
+    public void updateInventory(ProductInventoryEvent event) {
+        event.getProductQuantity().keySet().forEach(productId -> {
+            inventoryService.updateInventory(productId, event.getProductQuantity().get(productId));
+        });
     }
 
 }

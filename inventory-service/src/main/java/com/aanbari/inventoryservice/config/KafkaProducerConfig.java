@@ -22,6 +22,9 @@ public class KafkaProducerConfig {
 
     @Value("${spring.kafka.bootstrap-servers}")
     String bootstrapServers;
+    @Value("${spring.kafka.topic.update-inventory}")
+    private String updateInventoryTopic;
+
 
     @Bean
     public ProducerFactory<String, InventoryEvent> producerFactory() {
@@ -41,6 +44,12 @@ public class KafkaProducerConfig {
     public NewTopic topic() {
         return TopicBuilder
                 .name("inventory-topic")
+                .build();
+    }
+    @Bean
+    public NewTopic updateInventoryTopic() {
+        return TopicBuilder
+                .name(updateInventoryTopic)
                 .build();
     }
 

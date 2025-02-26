@@ -47,7 +47,7 @@ public class InventoryEventListener {
             // send message: update inventory
             Map<String, Integer> productQuantity = new HashMap<>();
             productAvailability.keySet().forEach(productId -> {
-                productQuantity.put(productId, 1);
+                productQuantity.put(productId, 1); // {product_id: quantity}
             });
             kafkaTemplate.send(updateInventoryTopic,
                     ProductInventoryEvent

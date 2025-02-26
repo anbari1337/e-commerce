@@ -23,7 +23,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(name = "product_id", nullable = false)
+    @Column(name = "product_id", nullable = false )
     private List<String> productId;
 
     @Column(name = "user_id", nullable = false)

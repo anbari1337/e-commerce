@@ -2,6 +2,8 @@ package com.aanbari.inventoryservice.config;
 
 import com.aanbari.inventoryservice.dto.OrderEvent;
 import com.aanbari.inventoryservice.dto.ProductInventoryEvent;
+import com.aanbari.inventoryservice.exception.InventoryNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,12 +12,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.KafkaListenerErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Configuration
 public class KafkaConsumerConfig {
     @Value("${spring.kafka.bootstrap-servers}")
@@ -49,6 +53,18 @@ public class KafkaConsumerConfig {
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(createConsumerFactory(eventType));
         return factory;
+    }
+
+    @Bean
+    public KafkaListenerErrorHandler kafkaErrorHandler() {
+        return (message, exception) -> {
+            if(exception.getCause() instanceof InventoryNotFoundException){
+                log.info("Kafka error: " + exception.getCause().getMessage());
+            }else{
+                log.error("Unexpected error processing Kafka message: {}", exception.getMessage(), exception);
+            }
+            return null; // Skip this message
+        };
     }
 
     @Bean

@@ -13,7 +13,7 @@ public class Inventory {
 
     @Id
     private String id;
-    private String productId;
+    private String productTag;
     private Integer quantityInStock;
     private boolean isAvailable;
 }

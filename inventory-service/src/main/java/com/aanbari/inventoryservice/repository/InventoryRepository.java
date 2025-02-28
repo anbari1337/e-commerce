@@ -6,7 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InventoryRepository extends MongoRepository<Inventory, String> {
-
-
-    Inventory findByProductId(String productId);
+    Inventory findByProductTag(String tag);
 }

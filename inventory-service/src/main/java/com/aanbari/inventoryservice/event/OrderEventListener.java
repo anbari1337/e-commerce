@@ -1,9 +1,11 @@
-package com.aanbari.inventoryservice.service;
+package com.aanbari.inventoryservice.event;
 
+import com.aanbari.inventoryservice.constants.InventoryActionsEnum;
 import com.aanbari.inventoryservice.dto.InventoryEvent;
 import com.aanbari.inventoryservice.dto.OrderEvent;
 import com.aanbari.inventoryservice.dto.ProductInventoryEvent;
 import com.aanbari.inventoryservice.exception.InventoryNotFoundException;
+import com.aanbari.inventoryservice.service.InventoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,6 @@ import java.util.Map;
 
 
 @Slf4j
-@Service
 public class OrderEventListener {
     private final InventoryService inventoryService;
     private final KafkaTemplate<String, InventoryEvent> kafkaTemplate;
@@ -33,7 +34,7 @@ public class OrderEventListener {
             containerFactory = "orderEventListenerFactory", errorHandler = "kafkaErrorHandler")
     public void checkProductAvailability(OrderEvent event) {
         try {
-            Map<String, Boolean> productAvailability = inventoryService.isProductAvailable(event.getProductId());
+            Map<String, Boolean> productAvailability = inventoryService.isProductAvailable(event.getProductTag());
             kafkaTemplate.send(topic.name(),
                     InventoryEvent
                             .builder()
@@ -47,9 +48,11 @@ public class OrderEventListener {
 
     @KafkaListener(topics = "${spring.kafka.topic.update-inventory}", groupId = "${spring.kafka.group}",
             containerFactory = "productInventoryEventListenerFactory", errorHandler = "kafkaErrorHandler")
-    public void updateInventory(ProductInventoryEvent event) {
-        event.getProductQuantity().keySet().forEach(productId -> {
-            inventoryService.updateInventory(productId, event.getProductQuantity().get(productId));
+    public void updateInventoryQuantity(ProductInventoryEvent event) {
+        event.getProductQuantity().keySet().forEach(productTag -> {
+            inventoryService.updateInventoryQuantity(productTag,
+                    event.getProductQuantity().get(productTag),
+                    InventoryActionsEnum.REDUCE);
         });
     }
 

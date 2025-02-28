@@ -37,7 +37,7 @@ public class OrderController {
         orderEventService.sendOrderEvent(
                 OrderEvent
                         .builder()
-                        .productId(newOrder.getProductId())
+                        .productTag(newOrder.getProductTag())
                         .orderId(newOrder.getId())
                         .build());
 

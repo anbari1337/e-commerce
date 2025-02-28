@@ -13,5 +13,5 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderEvent {
     private Integer orderId;
-    private List<String> productId;
+    private List<String> productTag;
 }

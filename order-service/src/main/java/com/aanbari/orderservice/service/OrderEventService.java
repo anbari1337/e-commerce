@@ -22,7 +22,7 @@ public class OrderEventService {
     public void sendOrderEvent(OrderEvent orderEvent) {
         kafkaTemplate.send(topic.name(),
                 OrderEvent.builder()
-                        .productId(orderEvent.getProductId())
+                        .productTag(orderEvent.getProductTag())
                         .orderId(orderEvent.getOrderId())
                         .build());
     }

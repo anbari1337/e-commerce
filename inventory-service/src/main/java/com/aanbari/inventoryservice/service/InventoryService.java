@@ -1,9 +1,9 @@
 package com.aanbari.inventoryservice.service;
 
+import com.aanbari.inventoryservice.constants.InventoryActionsEnum;
 import com.aanbari.inventoryservice.entity.Inventory;
 import com.aanbari.inventoryservice.repository.InventoryRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,17 +21,17 @@ public class InventoryService {
         this.inventoryRepository = inventoryRepository;
     }
 
-    public Inventory saveInventory(String productId) {
+    public Inventory saveInventory(String productTag) {
         // If product already exist => increment quantityInStock
-        Inventory inventory1 = inventoryRepository.findByProductId(productId);
+        Inventory inventory1 = inventoryRepository.findByProductTag(productTag);
 
         if (inventory1 == null) {
             Inventory newInventory = Inventory.builder()
-                    .productId(productId)
+                    .productTag(productTag)
                     .quantityInStock(1)
                     .isAvailable(true)
                     .build();
-        return inventoryRepository.save(newInventory);
+            return inventoryRepository.save(newInventory);
 
         } else {
             // If not save new one
@@ -41,26 +41,28 @@ public class InventoryService {
         return inventoryRepository.save(inventory1);
     }
 
-    public Inventory updateInventory(String productId, int quantity){
-        Inventory inventory = inventoryRepository.findByProductId(productId);
+    public void updateInventoryQuantity(String productTag, int quantity, InventoryActionsEnum action) {
+        Inventory inventory = inventoryRepository.findByProductTag(productTag);
 
-        int newQuantityInStock = inventory.getQuantityInStock() - quantity;
-        if(newQuantityInStock > 0){
+        int newQuantityInStock =
+                action == InventoryActionsEnum.REDUCE ?
+                        inventory.getQuantityInStock() - quantity :
+                        inventory.getQuantityInStock() + quantity;
+        if (newQuantityInStock > 0) {
             inventory.setQuantityInStock(newQuantityInStock);
-        }else {
+        } else {
             inventory.setQuantityInStock(0);
             inventory.setAvailable(false);
         }
         inventoryRepository.save(inventory);
-        return inventory;
     }
 
-    public Map<String, Boolean> isProductAvailable(List<String> productId){
+    public Map<String, Boolean> isProductAvailable(List<String> productTag) {
 
         Map<String, Boolean> productsAvailability = new HashMap<>();
-        productId.forEach(id -> {
-            Inventory inventory = inventoryRepository.findByProductId(id);
-                productsAvailability.put(id, inventory.isAvailable());
+        productTag.forEach(id -> {
+            Inventory inventory = inventoryRepository.findByProductTag(id);
+            productsAvailability.put(id, inventory.isAvailable());
         });
 
         return productsAvailability;

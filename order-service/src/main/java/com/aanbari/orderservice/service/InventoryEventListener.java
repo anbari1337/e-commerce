@@ -35,8 +35,8 @@ public class InventoryEventListener {
     public void checkProductAvailability(InventoryEvent event) {
         Map<String, Boolean> productAvailability = event.getProductAvailability();
         boolean allAvailable = true;
-        for (String productId : productAvailability.keySet()) {
-            if (!productAvailability.get(productId)) {
+        for (String productTag : productAvailability.keySet()) {
+            if (!productAvailability.get(productTag)) {
                 orderService.updateOrderStatus(event.getOrderId(), Constants.FAILED, productAvailability);
                 allAvailable = false;
                 break;
@@ -46,8 +46,8 @@ public class InventoryEventListener {
             orderService.updateOrderStatus(event.getOrderId(), Constants.SUCCESS, productAvailability);
             // send message: update inventory
             Map<String, Integer> productQuantity = new HashMap<>();
-            productAvailability.keySet().forEach(productId -> {
-                productQuantity.put(productId, 1); // {product_id: quantity}
+            productAvailability.keySet().forEach(productTag -> {
+                productQuantity.put(productTag, 1); // {product_tag: quantity}
             });
             kafkaTemplate.send(updateInventoryTopic,
                     ProductInventoryEvent

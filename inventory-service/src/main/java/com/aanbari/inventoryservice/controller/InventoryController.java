@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 public class InventoryController {
@@ -25,14 +24,4 @@ public class InventoryController {
         return ResponseEntity.ok(inventory);
     }
 
-    @GetMapping("/inventory/{productId}/reduce")
-    public ResponseEntity<Inventory> updateInventory(@PathVariable String productId,
-                                                     @RequestParam(
-                                                             required = false,
-                                                             defaultValue = "1"
-                                                     ) Integer quantity) {
-
-        Inventory inventory = inventoryService.updateInventory(productId, quantity);
-        return ResponseEntity.ok(inventory);
-    }
 }

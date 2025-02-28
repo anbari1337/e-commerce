@@ -1,6 +1,7 @@
 package com.aanbari.inventoryservice.config;
 
 import com.aanbari.inventoryservice.dto.OrderEvent;
+import com.aanbari.inventoryservice.dto.ProductEvent;
 import com.aanbari.inventoryservice.dto.ProductInventoryEvent;
 import com.aanbari.inventoryservice.exception.InventoryNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -85,6 +86,16 @@ public class KafkaConsumerConfig {
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, ProductInventoryEvent> productInventoryEventListenerFactory(){
         return createListenerContainerFactory(ProductInventoryEvent.class);
+    }
+
+    @Bean
+    public ConsumerFactory<String, ProductEvent> newProductEventConsumerFactory(){
+        return createConsumerFactory(ProductEvent.class);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, ProductEvent> newProductEventListenerFactory(){
+        return createListenerContainerFactory(ProductEvent.class);
     }
 
 }

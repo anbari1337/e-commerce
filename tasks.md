@@ -1,0 +1,4 @@
+- [ ] Handle not found exceptions: inventory not found / product not found / order not found
+- [ ] Add logs service:
+	- db: mongodb
+	- Entity: {service, message, date}

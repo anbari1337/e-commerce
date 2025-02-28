@@ -1,24 +1,30 @@
-version: '3.2'
+version: '3.8'  # Use the latest version for better features
 
 services:
+  # MongoDB for Inventory
   db-inventory:
     networks:
       - my-app
     image: mongo
+    container_name: db-inventory
     ports:
       - "27017:27017"
-  
+
+  # MongoDB for Product
   db-product:
     networks:
       - my-app
     image: mongo
+    container_name: db-product
     ports:
-      - "27017:27017"
+      - "27018:27017"
 
+  # PostgreSQL for Order
   db-order:
     networks:
       - my-app
     image: postgres
+    container_name: db-order
     ports:
       - "5432:5432"
     environment:
@@ -26,70 +32,59 @@ services:
       - POSTGRES_PASSWORD=admin
       - POSTGRES_DB=order-database
 
-  db-user:
-    networks:
-      - my-app
-    image: postgres
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=admin
-      - POSTGRES_DB=user-database
-
-## User service
-  user-service:
-    networks:
-      - my-app
-    image: aanbari/user-service:latest
-    container_name: user-service
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db-user
-    environment:
-      - SPRING_DATA_SOURCE_URL=jdbc:postgresql://db-user:5432/user-database
-      - SPRING_DATA_SOURCE_USERNAME=admin
-      - SPRING_DATA_SOURCE_PASSWORD=admin
-      - SPRING_JPA_HIBERNATE_DDL_AUT0=update
-
-## Product service
+  ## Product service
   product-service:
     networks:
       - my-app
-    image: aanbari/product-service:latest
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
     container_name: product-service
     ports:
       - "8081:8081"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://db-product:27017/product-database
     depends_on:
       - db-product
-      - kafka
 
-## Order service
+  ## Order service
   order-service:
     networks:
       - my-app
-    image: aanbari/order-service:latest
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
     container_name: order-service
     ports:
       - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-order:5432/order-database
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     depends_on:
       - db-order
       - kafka
+      - zookeeper
 
-## Inventory service
+  ## Inventory service
   inventory-service:
     networks:
       - my-app
-    image: aanbari/inventory-service:latest
+    build:
+      context: ./inventory-service
+      dockerfile: Dockerfile
     container_name: inventory-service
     ports:
       - "8083:8083"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://db-inventory:27017/inventory-database
     depends_on:
       - db-inventory
       - kafka
+      - zookeeper
 
-
+  ## Zookeeper
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper
@@ -99,6 +94,7 @@ services:
     networks:
       - my-app
 
+  ## Kafka
   kafka:
     image: confluentinc/cp-kafka:latest
     container_name: kafka
@@ -114,8 +110,7 @@ services:
     depends_on:
       - zookeeper
     networks:
-        - my-app
-
+      - my-app
 
 networks:
   my-app:

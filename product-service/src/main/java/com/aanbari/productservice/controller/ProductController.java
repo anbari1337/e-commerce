@@ -33,8 +33,8 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public List<Product> getAllProducts(){
-        return productService.getProductsList();
+    public List<Product> getAllProducts(@RequestParam int page, @RequestParam int size, @RequestParam String sortBy){
+        return productService.getProductsList(page, size, sortBy);
     }
 
     @GetMapping("/product/{id}")

@@ -5,6 +5,8 @@ import com.aanbari.productservice.entity.Product;
 import com.aanbari.productservice.exception.ProductNotFoundException;
 import com.aanbari.productservice.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,8 +21,9 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public List<Product> getProductsList(){
-        return productRepository.findAll();
+    public List<Product> getProductsList(int page, int size, String sortBy){
+
+        return productRepository.findAll(PageRequest.of(page, size, Sort.by(sortBy))).stream().toList();
     }
 
     public Product saveProduct(ProductDto product) {

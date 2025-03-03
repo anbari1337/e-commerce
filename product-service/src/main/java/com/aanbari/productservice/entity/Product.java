@@ -10,6 +10,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.math.BigInteger;
 import java.time.Instant;
 
 @Getter
@@ -33,7 +34,7 @@ public class Product {
     @Column(length = 500)
     private String description;
 
-    private Long price;
+    private BigInteger price;
 
     @CreatedDate
     @Column(updatable = false)

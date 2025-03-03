@@ -17,10 +17,14 @@ services:
     container_name: db-product
     ports:
       - "5433:5432"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./src/main/resources/sql/data.sql:/docker-entrypoint-initdb.d/data.sql  
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
       - POSTGRES_DB=product-database
+
 
   # PostgreSQL for Order
   db-order:
@@ -118,3 +122,6 @@ services:
 networks:
   my-app:
     driver: bridge
+
+volumes:
+  mysql_data:

@@ -6,7 +6,6 @@ import com.aanbari.inventoryservice.dto.OrderEvent;
 import com.aanbari.inventoryservice.dto.ProductInventoryEvent;
 import com.aanbari.inventoryservice.exception.InventoryNotFoundException;
 import com.aanbari.inventoryservice.service.InventoryService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,8 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
-
-@Slf4j
+@Service
 public class OrderEventListener {
     private final InventoryService inventoryService;
     private final KafkaTemplate<String, InventoryEvent> kafkaTemplate;

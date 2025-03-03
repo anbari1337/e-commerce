@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -23,9 +24,8 @@ public class InventoryService {
 
     public Inventory saveInventory(String productTag) {
         // If product already exist => increment quantityInStock
-        Inventory inventory1 = inventoryRepository.findByProductTag(productTag);
-
-        if (inventory1 == null) {
+        Optional<Inventory> inventory1 = inventoryRepository.findByProductTag(productTag);
+        if (inventory1.isEmpty()) {
             Inventory newInventory = Inventory.builder()
                     .productTag(productTag)
                     .quantityInStock(1)
@@ -35,14 +35,15 @@ public class InventoryService {
 
         } else {
             // If not save new one
-            inventory1.setQuantityInStock(inventory1.getQuantityInStock() + 1);
-            inventory1.setAvailable(true);
+            Inventory inventory = inventory1.get();
+            inventory.setQuantityInStock(inventory.getQuantityInStock() + 1);
+            inventory.setAvailable(true);
+            return inventoryRepository.save(inventory);
         }
-        return inventoryRepository.save(inventory1);
     }
 
     public void updateInventoryQuantity(String productTag, int quantity, InventoryActionsEnum action) {
-        Inventory inventory = inventoryRepository.findByProductTag(productTag);
+        Inventory inventory = inventoryRepository.findByProductTag(productTag).get();
 
         int newQuantityInStock =
                 action == InventoryActionsEnum.REDUCE ?
@@ -61,7 +62,7 @@ public class InventoryService {
 
         Map<String, Boolean> productsAvailability = new HashMap<>();
         productTag.forEach(id -> {
-            Inventory inventory = inventoryRepository.findByProductTag(id);
+            Inventory inventory = inventoryRepository.findByProductTag(id).get();
             productsAvailability.put(id, inventory.isAvailable());
         });
 

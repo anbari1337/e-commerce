@@ -20,7 +20,7 @@ public class InventoryController {
 
     @PostMapping("/inventory")
     public ResponseEntity<Inventory> saveInventory(@RequestBody ProductRequest productRequest) {
-        Inventory inventory = inventoryService.saveInventory(productRequest.getProductId());
+        Inventory inventory = inventoryService.saveInventory(productRequest.getProductTag());
         return ResponseEntity.ok(inventory);
     }
 

@@ -27,7 +27,7 @@ public class OrderService {
                 .builder()
                         .price(order.getPrice())
                         .userId(order.getUserId())
-                        .productId(order.getProductId())
+                        .productTag(order.getProductTag())
                         .status(Constants.PENDING)
                 .build());
     }

@@ -48,7 +48,7 @@ public class OrderEventListener {
 
     @KafkaListener(topics = "${spring.kafka.topic.update-inventory}", groupId = "${spring.kafka.group}",
             containerFactory = "productInventoryEventListenerFactory", errorHandler = "kafkaErrorHandler")
-    public void updateInventoryQuantity(ProductInventoryEvent event) {
+    public void reduceProductQuantity(ProductInventoryEvent event) {
         event.getProductQuantity().keySet().forEach(productTag -> {
             inventoryService.updateInventoryQuantity(productTag,
                     event.getProductQuantity().get(productTag),

@@ -6,7 +6,7 @@ import java.util.List;
 
 @Getter
 public class OrderRequest {
-    private List<String> productId;
+    private List<String> productTag;
     private Integer userId;
     private Double price;
 }

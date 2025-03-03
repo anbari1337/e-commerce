@@ -16,7 +16,7 @@ import java.util.Map;
 @Service
 public class InventoryEventListener {
 
-    private OrderService orderService;
+    private final OrderService orderService;
     private final KafkaTemplate<String, ProductInventoryEvent> kafkaTemplate;
 
     @Value("${spring.kafka.topic.update-inventory}")

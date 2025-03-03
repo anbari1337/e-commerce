@@ -1,28 +1,44 @@
 package com.aanbari.productservice.entity;
 
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Generated;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Getter
 @Builder
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "t_product")
+@EntityListeners(AuditingEntityListener.class) // Enable auditing at entity level
 public class Product {
+
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String tag;
+
+    @Column(length = 500)
     private String description;
+
     private Long price;
 
     @CreatedDate
-    private Date createdAt;
+    @Column(updatable = false)
+    private Instant createdAt;
     @LastModifiedDate
-    private Date updatedAt;
+    private Instant updatedAt;
 
 }

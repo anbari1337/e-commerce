@@ -7,6 +7,8 @@ import com.aanbari.productservice.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProductService {
 
@@ -17,6 +19,9 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
+    public List<Product> getProductsList(){
+        return productRepository.findAll();
+    }
 
     public Product saveProduct(ProductDto product) {
         return productRepository.save(
@@ -30,7 +35,7 @@ public class ProductService {
         );
     }
 
-    public Product getProductById(String id) throws Exception{
+    public Product getProductById(Integer id) throws Exception{
         return  productRepository.findById(id).orElseThrow(()-> new ProductNotFoundException("Product not found with id="+id)); // TODO ProductNotFoundException
     }
 
